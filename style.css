@@ -31,6 +31,7 @@
   box-shadow: 0 0 8px var(--accent);
   z-index: 9998; /* below CRT overlay at 9999 */
   pointer-events: none;
+  will-change: width;
 }
 
 /* ==============================================
@@ -733,13 +734,13 @@ ul { list-style: none; }
    ============================================== */
 .fade-in {
   opacity: 0;
+  transition: opacity 0.55s ease, transform 0.55s ease;
   /* transform is set inline by Motion One; only opacity needed for CSS fallback */
 }
 
 .fade-in.visible {
   opacity: 1;
   transform: none;
-  transition: opacity 0.55s ease, transform 0.55s ease;
 }
 
 /* ==============================================
