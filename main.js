@@ -151,10 +151,15 @@
 
       })
       .catch(function () {
-        // CDN failed — clear any inline styles Motion One may have set and activate CSS fallback
-        document.querySelectorAll('.fade-in, .section-header, .skill-tag').forEach(function (el) {
+        // CDN failed or runtime error — reveal all page content
+        // 1. Fade-in elements: add .visible to trigger the CSS fallback animation
+        document.querySelectorAll('.fade-in').forEach(function (el) {
           el.style.opacity = '';
           el.classList.add('visible');
+        });
+        // 2. Other animated targets: clear any inline opacity Motion One set before failing
+        document.querySelectorAll('.section-header, .skill-tag').forEach(function (el) {
+          el.style.opacity = '';
         });
       });
   }
