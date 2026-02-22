@@ -120,15 +120,17 @@
         // --- Individual card / timeline item reveals ---
         // Each element slides up 24px and fades in as it enters the viewport
         document.querySelectorAll('.card, .timeline-item').forEach(function (el) {
-          inView(el, function () {
+          var stop = inView(el, function () {
             animate(el, { opacity: [0, 1], y: [24, 0] }, { duration: 0.5, easing: 'ease-out' });
+            stop();
           }, { margin: '-8% 0px 0px 0px' });
         });
 
         // --- Section headers ---
         document.querySelectorAll('.section-header').forEach(function (el) {
-          inView(el, function () {
+          var stop = inView(el, function () {
             animate(el, { opacity: [0, 1], y: [16, 0] }, { duration: 0.4, easing: 'ease-out' });
+            stop();
           }, { margin: '-8% 0px 0px 0px' });
         });
 
@@ -137,19 +139,21 @@
         var skillsGrid = document.querySelector('.skills-grid');
         if (skillsGrid) {
           var tags = skillsGrid.querySelectorAll('.skill-tag');
-          inView(skillsGrid, function () {
+          var stopTags = inView(skillsGrid, function () {
             animate(tags, { opacity: [0, 1], y: [12, 0] }, {
               duration: 0.3,
               easing: 'ease-out',
               delay: stagger(0.04)
             });
+            stopTags();
           }, { margin: '-5% 0px 0px 0px' });
         }
 
       })
       .catch(function () {
-        // CDN failed — activate CSS fallback immediately
-        document.querySelectorAll('.fade-in').forEach(function (el) {
+        // CDN failed — clear any inline styles Motion One may have set and activate CSS fallback
+        document.querySelectorAll('.fade-in, .section-header, .skill-tag').forEach(function (el) {
+          el.style.opacity = '';
           el.classList.add('visible');
         });
       });
