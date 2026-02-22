@@ -91,49 +91,68 @@
 
 
   /* ==============================================
-     INTERSECTION OBSERVER — FADE IN ON SCROLL
+     MOTION ONE — SCROLL ANIMATIONS
      ============================================== */
 
-  const fadeElements = document.querySelectorAll('.fade-in');
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (fadeElements.length && 'IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-
-          // Stagger sibling cards
-          const parent = entry.target.parentElement;
-          const siblings = parent ? parent.querySelectorAll('.fade-in') : [];
-          let delay = 0;
-
-          siblings.forEach(function (sibling, idx) {
-            if (sibling === entry.target) {
-              delay = idx * 80;
-            }
-          });
-
-          setTimeout(function () {
-            entry.target.classList.add('visible');
-          }, delay);
-
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.08,
-        rootMargin: '0px 0px -40px 0px',
-      }
-    );
-
-    fadeElements.forEach(function (el) {
-      observer.observe(el);
-    });
-  } else {
-    // Fallback: make all visible immediately if IntersectionObserver unavailable
-    fadeElements.forEach(function (el) {
+  if (prefersReducedMotion) {
+    // Respect user preference: show everything immediately
+    document.querySelectorAll('.fade-in').forEach(function (el) {
       el.classList.add('visible');
     });
+  } else {
+    import('https://cdn.jsdelivr.net/npm/motion@11/+esm')
+      .then(function (m) {
+        var animate = m.animate;
+        var inView  = m.inView;
+        var scroll  = m.scroll;
+        var stagger = m.stagger;
+
+        // --- Scroll progress bar ---
+        var progressEl = document.getElementById('scroll-progress');
+        if (progressEl) {
+          scroll(function (progress) {
+            progressEl.style.width = (progress * 100) + '%';
+          });
+        }
+
+        // --- Individual card / timeline item reveals ---
+        // Each element slides up 24px and fades in as it enters the viewport
+        document.querySelectorAll('.card, .timeline-item').forEach(function (el) {
+          inView(el, function () {
+            animate(el, { opacity: [0, 1], y: [24, 0] }, { duration: 0.5, easing: 'ease-out' });
+          }, { margin: '-8% 0px 0px 0px' });
+        });
+
+        // --- Section headers ---
+        document.querySelectorAll('.section-header').forEach(function (el) {
+          inView(el, function () {
+            animate(el, { opacity: [0, 1], y: [16, 0] }, { duration: 0.4, easing: 'ease-out' });
+          }, { margin: '-8% 0px 0px 0px' });
+        });
+
+        // --- Staggered skill tags ---
+        // The whole grid triggers once, then all tags stagger in 40ms apart
+        var skillsGrid = document.querySelector('.skills-grid');
+        if (skillsGrid) {
+          var tags = skillsGrid.querySelectorAll('.skill-tag');
+          inView(skillsGrid, function () {
+            animate(tags, { opacity: [0, 1], y: [12, 0] }, {
+              duration: 0.3,
+              easing: 'ease-out',
+              delay: stagger(0.04)
+            });
+          }, { margin: '-5% 0px 0px 0px' });
+        }
+
+      })
+      .catch(function () {
+        // CDN failed — activate CSS fallback immediately
+        document.querySelectorAll('.fade-in').forEach(function (el) {
+          el.classList.add('visible');
+        });
+      });
   }
 
 
