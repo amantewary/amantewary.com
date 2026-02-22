@@ -19,6 +19,21 @@
 }
 
 /* ==============================================
+   SCROLL PROGRESS BAR
+   ============================================== */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  z-index: 9998; /* below CRT overlay at 9999 */
+  pointer-events: none;
+}
+
+/* ==============================================
    RESET + BASE
    ============================================== */
 *, *::before, *::after {
@@ -718,13 +733,13 @@ ul { list-style: none; }
    ============================================== */
 .fade-in {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  /* transform is set inline by Motion One; only opacity needed for CSS fallback */
 }
 
 .fade-in.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
+  transition: opacity 0.55s ease, transform 0.55s ease;
 }
 
 /* ==============================================
